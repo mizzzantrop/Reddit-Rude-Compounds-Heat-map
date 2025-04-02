@@ -2,5 +2,6 @@ An interactive heat map showing the frequency of rude pejorative compounds (e.g.
 
 [![image](https://github.com/user-attachments/assets/dc7bdf6e-3a9e-4bf7-913a-562b2841ca8e)
 ]((https://mizzzantrop.github.io/))
+
 ⬆⬆⬆⬆⬆
 Click on the image⚡️
