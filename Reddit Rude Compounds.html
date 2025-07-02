@@ -3,8 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Составные ругательства Reddit</title>
-<script src="https://cdn.tailwindcss.com"></script>
+    <title data-i18n="pageTitle">Составные ругательства Reddit</title>
+    <meta name="description" content="Интерактивная тепловая карта частоты использования грубых составных слов на Reddit с 2006 по 2020 год." data-i18n-attr="content:metaDescription">
+    <meta property="og:title" content="Тепловая карта грубых слов Reddit" data-i18n-attr="content:ogTitle" />
+    <meta property="og:description" content="Интерактивная тепловая карта частоты использования грубых составных слов на Reddit с 2006 по 2020 год." data-i18n-attr="content:ogDescription" />
+    <meta property="og:type" content="website" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
       :root {
         --cell-size: 40px;
@@ -36,19 +41,23 @@
       }
 
       .frequency-0 {
-        background-color: #ffffff;
+        background-color: #f7f7f7;  /* Lightest */
+        color: #a0a0a0;          /* Gray text for contrast */
       }
       .frequency-1 {
-        background-color: #fff7e6;
+        background-color: #f2f0f7;
+        color: #7a7491;
       }
       .frequency-2 {
-        background-color: #ffcc80;
+        background-color: #e3ddec;
+        color: #504371;
       }
       .frequency-3 {
-        background-color: #ff6b6b;
+        background-color: #c4b7db;
+        color: #332055;
       }
       .frequency-4 {
-        background-color: #8b0000;
+        background-color: #947fc2;  /* Darkest */
         color: white;
       }
 
@@ -69,66 +78,89 @@
       }
     </style>
   </head>
-  <body class="bg-gray-50 min-h-screen">
-    <div class="container mx-auto px-4 py-8 max-w-7xl">
-      <h1 class="text-4xl font-bold mb-6 text-gray-800">
-        Грубые составные слова на Reddit
-      </h1>
 
-      <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
-        <p class="text-gray-600 leading-relaxed">
-          Частота использования пейоративных составных слов (например,
-          "тупоголовый", "мудозвон") в комментариях Reddit за период 2006-2020
-          гг. Строки (префиксы) и столбцы (суффиксы) отсортированы по общей
-          частоте употребления. Префиксы и суффиксы отображаются на английском и
-          русском языках.
-        </p>
+  <body class="bg-gray-50 min-h-screen" id="app">
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+      <div class="flex justify-between items-start mb-6">
+        <h1 class="text-4xl font-bold text-gray-800" data-i18n="title">
+          Грубые составные слова на Reddit
+        </h1>
+        <!-- Language Switcher -->
+        <div id="language-switcher" class="flex items-center p-1 bg-gray-200 rounded-lg">
+          <button data-lang="ru" class="px-3 py-1 text-sm font-medium rounded-md transition-colors">RU</button>
+          <button data-lang="en" class="px-3 py-1 text-sm font-medium rounded-md transition-colors">EN</button>
+        </div>
       </div>
 
-      <div class="bg-white rounded-xl shadow-sm p-6 mb-8 overflow-x-auto">
+      <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+        <p class="text-gray-600 leading-relaxed" data-i18n="description"></p>
+      </div>
+
+      <div class="bg-white rounded-xl shadow-md p-6 mb-8 overflow-x-auto">
         <div class="grid-container" id="wordGrid">
           <!-- First row (suffixes) -->
-          <div class="header-cell">Префикс ↓ Суффикс →</div>
+          <div class="header-cell" data-i18n="gridHeader">Префикс ↓ Суффикс →</div>
           <!-- Headers filled by JavaScript -->
         </div>
       </div>
 
-      <div class="result-box rounded-xl shadow-sm p-6 mb-8">
-        <div id="wordResult" class="text-xl text-center text-gray-700">
+      <div class="result-box rounded-xl shadow-md p-6 mb-8" data-i18n-key="resultBox">
+        <div id="wordResult" class="text-xl text-center text-gray-700 whitespace-pre-line" data-i18n="resultText">
           Нажмите на любую ячейку, чтобы увидеть составное слово
         </div>
       </div>
 
+      <!-- Random Word Generator -->
+      <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+        <h3 class="text-lg font-semibold mb-4 text-gray-800" data-i18n="generatorTitle">
+          Генератор случайных ругательств
+        </h3>
+        <div class="flex flex-col sm:flex-row items-center gap-4">
+          <button id="generate-btn" class="w-full sm:w-auto bg-indigo-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-opacity-50" data-i18n="generateButton">
+            Сгенерировать
+          </button>
+          <div id="random-word-output" class="relative w-full p-3 bg-gray-100 border border-gray-300 rounded-lg text-center text-gray-700 cursor-pointer" data-i18n-attr="title:copyTooltip">
+            <span id="random-word-text" class="whitespace-pre-line" data-i18n="generatorPlaceholder">Нажмите кнопку...</span>
+          </div>
+        </div>
+      </div>
+
       <div class="bg-white rounded-xl shadow-sm p-6">
-        <h3 class="text-lg font-semibold mb-4 text-gray-800">
+        <h3 class="text-lg font-semibold mb-4 text-gray-800" data-i18n="legendTitle">
           Частота использования:
         </h3>
         <div class="flex gap-4 flex-wrap">
           <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded bg-[#8b0000]"></div>
-            <span class="text-sm text-gray-600">~3 млн комментариев</span>
+            <div class="w-6 h-6 rounded bg-[#947fc2]"></div>
+            <span class="text-sm text-gray-600" data-i18n="legend1">~3 млн комментариев</span>
           </div>
           <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded bg-[#ff6b6b]"></div>
-            <span class="text-sm text-gray-600">~1 млн комментариев</span>
+            <div class="w-6 h-6 rounded bg-[#c4b7db]"></div>
+            <span class="text-sm text-gray-600" data-i18n="legend2">~1 млн комментариев</span>
           </div>
           <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded bg-[#ffcc80]"></div>
-            <span class="text-sm text-gray-600">10-100 тыс. комментариев</span>
+            <div class="w-6 h-6 rounded bg-[#e3ddec]"></div>
+            <span class="text-sm text-gray-600" data-i18n="legend3">10-100 тыс. комментариев</span>
           </div>
           <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded bg-[#fff7e6]"></div>
-            <span class="text-sm text-gray-600">1-10 тыс. комментариев</span>
+            <div class="w-6 h-6 rounded bg-[#f2f0f7]"></div>
+            <span class="text-sm text-gray-600" data-i18n="legend4">1-10 тыс. комментариев</span>
           </div>
           <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded bg-white border"></div>
-            <span class="text-sm text-gray-600">менее 1 тыс. комментариев</span>
+            <div class="w-6 h-6 rounded bg-[#f7f7f7] border"></div>
+            <span class="text-sm text-gray-600" data-i18n="legend5">менее 1 тыс. комментариев</span>
           </div>
         </div>
       </div>
-    </div>
 
-    <script>
+      <footer class="text-center mt-12 py-4 border-t border-gray-200">
+          <p class="text-sm text-gray-500" data-i18n-html="dataSource">
+              <!-- This content is populated by JavaScript -->
+          </p>
+      </footer>
+    </div>
+  
+    <script type="module"> 
       const suffixes = {
         ass: "жопа",
         bag: "мешок",
@@ -192,6 +224,335 @@
         [0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 0, 1],
       ]
 
+      const translations = {
+        ru: {
+          pageTitle: "Тепловая карта грубых слов Reddit",
+          metaDescription: "Интерактивная тепловая карта частоты использования грубых составных слов на Reddit с 2006 по 2020 год.",
+          ogTitle: "Тепловая карта грубых слов Reddit",
+          ogDescription: "Интерактивная тепловая карта частоты использования грубых составных слов на Reddit с 2006 по 2020 год.",
+          title: "Грубые составные слова на Reddit",
+          description: "Частота использования пейоративных составных слов (например, \"тупоголовый\", \"мудозвон\") в комментариях Reddit за период 2006-2020 гг. Строки (префиксы) и столбцы (суффиксы) отсортированы по общей частоте употребления. Префиксы и суффиксы отображаются на английском языке.",
+          resultText: "Нажмите на любую ячейку, чтобы увидеть составное слово",
+          legendTitle: "Частота использования:",
+          gridHeader: "Префикс ↓ Суффикс →",
+          legend1: "~3 млн комментариев",
+          legend2: "~1 млн комментариев",
+          legend3: "10-100 тыс. комментариев",
+          legend4: "1-10 тыс. комментариев",
+          legend5: "менее 1 тыс. комментариев",
+          generatorTitle: "Генератор случайных ругательств",
+          generateButton: "Сгенерировать",
+          generatorPlaceholder: "Нажмите кнопку...",
+          copyTooltip: "Нажмите, чтобы скопировать",
+          copiedTooltip: "Скопировано!",
+          dataSource: 'Источник данных и вдохновение: <a href="https://colinmorris.github.io/blog/compound-curse-words" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline">A data-driven guide to creating your own compound curse words</a> от Колина Морриса.',
+        },
+      en: {
+        pageTitle: "Reddit Rude Compounds Heatmap",
+        metaDescription: "An interactive heatmap of the frequency of rude compound words used on Reddit from 2006 to 2020.",
+        ogTitle: "Reddit Rude Compounds Heatmap",
+        ogDescription: "An interactive heatmap of the frequency of rude compound words used on Reddit from 2006 to 2020.",
+        title: "Rude Compound Words on Reddit",
+        description: "Frequency of pejorative compound words (e.g., \"blockhead,\" \"dumbbell\") used on Reddit between 2006 and 2020. Rows (prefixes) and columns (suffixes) are sorted by overall frequency of use. Prefixes and suffixes are displayed in English.",
+        resultText: "Click on any cell to see the compound word",
+        legendTitle: "Frequency of Use:",
+        gridHeader: "Prefix ↓ Suffix →",
+        legend1: "~3M comments",
+        legend2: "~1M comments",
+        legend3: "10-100k comments",
+        legend4: "1-10k comments",
+        legend5: "<1k comments",
+        generatorTitle: "Random Curse Generator",
+        generateButton: "Generate",
+        generatorPlaceholder: "Click the button...",
+        copyTooltip: "Click to copy",
+        copiedTooltip: "Copied!",
+        dataSource: 'Data source and inspiration: <a href="https://colinmorris.github.io/blog/compound-curse-words" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline">A data-driven guide to creating your own compound curse words</a> by Colin Morris.',
+      },
+    }
+
+    // Translations for compound words (will be populated later)
+    const wordTranslations = {
+      "dumb-ass": "тупожоп",
+      "dumb-bag": "тупомешок",
+      "dumb-head": "тупоголовый",
+      "dumb-shit": "тупоговно",
+      "dumb-hat": "тупошляп",
+      "dumb-tard": "туподебил",
+      "dumb-lord": "туполорд", // Возможно, стоит заменить на более грубый аналог
+      "dumb-wit": "тупомозглый",
+      "dumb-face": "тупорожий",
+      "dumb-wad": "туподырый", // ???
+      "dumb-sucker": "тупосос",
+      "dumb-boy": "тупопацан",
+      "dumb-stain": "тупопятно",
+      "dumb-stick": "тупопалка",
+      "dumb-nozzle": "туподырка",
+      "dumb-clown": "тупоклоун",
+      "dumb-waffle": "туповафля",
+      "dumb-goblin": "тупогоблин",
+      "scum-ass": "мразь",
+      "scum-bag": "мразь",
+      "scum-head": "мразь",
+      "scum-shit": "мразь",
+      "scum-hat": "мразь",
+      "scum-tard": "мразь",
+      "scum-lord": "мразь",
+      "scum-wit": "мразь",
+      "scum-face": "мразь",
+      "scum-wad": "мразь",
+      "scum-sucker": "мразь",
+      "scum-boy": "мразь",
+      "scum-stain": "мразь",
+      "scum-stick": "мразь",
+      "scum-nozzle": "мразь",
+      "scum-clown": "мразь",
+      "scum-waffle": "мразь",
+      "scum-goblin": "мразь",
+      "douche-ass": "мудила",
+      "douche-bag": "мудила",
+      "douche-head": "мудила",
+      "douche-shit": "мудила",
+      "douche-hat": "мудила",
+      "douche-tard": "мудила",
+      "douche-lord": "мудила",
+      "douche-wit": "мудила",
+      "douche-face": "мудила",
+      "douche-wad": "мудила",
+      "douche-sucker": "мудила",
+      "douche-boy": "мудила",
+      "douche-stain": "мудила",
+      "douche-stick": "мудила",
+      "douche-nozzle": "мудила",
+      "douche-clown": "мудила",
+      "douche-waffle": "мудила",
+      "douche-goblin": "мудила",
+      "shit-ass": "говнюк",
+      "shit-bag": "говнюк",
+      "shit-head": "говнюк",
+      "shit-shit": "говнюк",
+      "shit-hat": "говнюк",
+      "shit-tard": "говнюк",
+      "shit-lord": "говнюк",
+      "shit-wit": "говнюк",
+      "shit-face": "говнюк",
+      "shit-wad": "говнюк",
+      "shit-sucker": "говнюк",
+      "shit-boy": "говнюк",
+      "shit-stain": "говнюк",
+      "shit-stick": "говнюк",
+      "shit-nozzle": "говнюк",
+      "shit-clown": "говнюк",
+      "shit-waffle": "говнюк",
+      "shit-goblin": "говнюк",
+      "dick-ass": "пидарас", // Или "мудак" в зависимости от контекста
+      "dick-bag": "пидарас",
+      "dick-head": "пидарас",
+      "dick-shit": "пидарас",
+      "dick-hat": "пидарас",
+      "dick-tard": "пидарас",
+      "dick-lord": "пидарас",
+      "dick-wit": "пидарас",
+      "dick-face": "пидарас",
+      "dick-wad": "пидарас",
+      "dick-sucker": "пидарас",
+      "dick-boy": "пидарас",
+      "dick-stain": "пидарас",
+      "dick-stick": "пидарас",
+      "dick-nozzle": "пидарас",
+      "dick-clown": "пидарас",
+      "dick-waffle": "пидарас",
+      "dick-goblin": "пидарас",
+      "fuck-ass": "ебанько",
+      "fuck-bag": "ебанько",
+      "fuck-head": "ебанько",
+      "fuck-shit": "ебанько",
+      "fuck-hat": "ебанько",
+      "fuck-tard": "ебанько",
+      "fuck-lord": "ебанько",
+      "fuck-wit": "ебанько",
+      "fuck-face": "ебанько",
+      "fuck-wad": "ебанько",
+      "fuck-sucker": "ебанько",
+      "fuck-boy": "ебанько",
+      "fuck-stain": "ебанько",
+      "fuck-stick": "ебанько",
+      "fuck-nozzle": "ебанько",
+      "fuck-clown": "ебанько",
+      "fuck-waffle": "ебанько",
+      "fuck-goblin": "ебанько",
+      "dip-ass": "долбоеб",
+      "dip-bag": "долбоеб",
+      "dip-head": "долбоеб",
+      "dip-shit": "долбоеб",
+      "dip-hat": "долбоеб",
+      "dip-tard": "долбоеб",
+      "dip-lord": "долбоеб",
+      "dip-wit": "долбоеб",
+      "dip-face": "долбоеб",
+      "dip-wad": "долбоеб",
+      "dip-sucker": "долбоеб",
+      "dip-boy": "долбоеб",
+      "dip-stain": "долбоеб",
+      "dip-stick": "долбоеб",
+      "dip-nozzle": "долбоеб",
+      "dip-clown": "долбоеб",
+      "dip-waffle": "долбоеб",
+      "dip-goblin": "долбоеб",
+      "ass-ass": "жопожоп",
+      "ass-bag": "жопомешок",
+      "ass-head": "жопоголовый",
+      "ass-shit": "жопоговно",
+      "ass-hat": "жопошляп",
+      "ass-tard": "жоподебил",
+      "ass-lord": "жополорд",
+      "ass-wit": "жопомозглый",
+      "ass-face": "жопорожий",
+      "ass-wad": "жоподырый",
+      "ass-sucker": "жопосос",
+      "ass-boy": "жопопацан",
+      "ass-stain": "жопопятно",
+      "ass-stick": "жопопалка",
+      "ass-nozzle": "жоподырка",
+      "ass-clown": "жопоклоун",
+      "ass-waffle": "жоповафля",
+      "ass-goblin": "жопогоблин",
+    }
+
+
+      const setLanguage = (language) => {
+        document.documentElement.lang = language;
+
+        // Translate text content (innerText)
+        document.querySelectorAll("[data-i18n]").forEach((element) => {
+          const key = element.dataset.i18n;
+          if (translations[language][key]) {
+            element.innerText = translations[language][key];
+          }
+        });
+
+        // Translate HTML content (innerHTML)
+        document.querySelectorAll("[data-i18n-html]").forEach((element) => {
+            const key = element.dataset.i18nHtml;
+            if (translations[language][key]) { element.innerHTML = translations[language][key]; }
+        });
+
+        // Translate attributes like meta tags
+        document.querySelectorAll("[data-i18n-attr]").forEach((element) => {
+            const [attr, key] = element.dataset.i18nAttr.split(':');
+            if (translations[language][key]) {
+                element.setAttribute(attr, translations[language][key]);
+            }
+        })
+
+        // Update result box text based on language
+        const resultBox = document.querySelector('[data-i18n-key="resultBox"]')
+        const wordResult = resultBox.querySelector("#wordResult")
+        wordResult.innerText = translations[language].resultText
+
+        if (wordResult.dataset.composedWord) {
+          updateResultText(wordResult.dataset.composedWord, language)
+        }
+
+        // Update random generator text if a word is already generated
+        const randomWordOutput = document.getElementById('random-word-output');
+        if (randomWordOutput && randomWordOutput.dataset.copyText) {
+            const composedWord = randomWordOutput.dataset.copyText;
+            const translation = wordTranslations[composedWord];
+            let displayText = `${composedWord}`;
+            if (language === 'ru' && translation) {
+                displayText = `Слово: ${composedWord}\nПеревод: ${translation}`;
+            }
+            document.getElementById('random-word-text').innerText = displayText;
+        }
+
+
+        // Update language switcher UI
+        const switcher = document.getElementById("language-switcher");
+        switcher.querySelectorAll('button').forEach(btn => {
+            if (btn.dataset.lang === language) {
+                btn.classList.add('bg-white', 'text-indigo-600');
+                btn.classList.remove('text-gray-600');
+            } else {
+                btn.classList.remove('bg-white', 'text-indigo-600');
+                btn.classList.add('text-gray-600');
+            }
+        });
+      }
+
+      // Detect browser language
+      const userLanguage = navigator.language.startsWith("ru") ? "ru" : "en"
+
+      // Language switcher
+      const languageSwitcher = document.getElementById("language-switcher")
+      languageSwitcher.addEventListener('click', (event) => {
+          if (event.target.tagName === 'BUTTON') {
+              setLanguage(event.target.dataset.lang);
+          }
+      });
+
+      const updateResultText = (composedWord, language) => {
+        const translation = wordTranslations[composedWord]
+        const wordResult = document.getElementById("wordResult");
+        wordResult.dataset.composedWord = composedWord
+
+        if (language === "ru" && translation) {
+          wordResult.innerText = `Слово: ${composedWord}\nПеревод: ${translation}`
+        } else {
+          wordResult.innerText = `Word: ${composedWord}`
+        }
+      }
+
+      // --- Random Word Generator Logic ---
+      const generateBtn = document.getElementById('generate-btn');
+      const randomWordOutput = document.getElementById('random-word-output');
+      const randomWordText = document.getElementById('random-word-text');
+
+      const generateAndShowRandomWord = () => {
+          const prefixKeys = Object.keys(prefixes);
+          const suffixKeys = Object.keys(suffixes);
+
+          const randomPrefix = prefixKeys[Math.floor(Math.random() * prefixKeys.length)];
+          const randomSuffix = suffixKeys[Math.floor(Math.random() * suffixKeys.length)];
+          
+          const composedWord = `${randomPrefix}-${randomSuffix}`;
+          
+          const currentLang = document.documentElement.lang;
+          const translation = wordTranslations[composedWord];
+
+          let displayText = `${composedWord}`;
+          if (currentLang === 'ru' && translation) {
+              displayText = `Слово: ${composedWord}\nПеревод: ${translation}`;
+          }
+          
+          randomWordText.innerText = displayText;
+          randomWordOutput.dataset.copyText = composedWord; // Store the raw English word to copy
+      };
+
+      generateBtn.addEventListener('click', generateAndShowRandomWord);
+
+      randomWordOutput.addEventListener('click', () => {
+          const textToCopy = randomWordOutput.dataset.copyText;
+          if (!textToCopy) return;
+
+          navigator.clipboard.writeText(textToCopy).then(() => {
+              const currentLang = document.documentElement.lang;
+              const originalText = randomWordText.innerText;
+              const originalTitle = randomWordOutput.title;
+              const copiedMessage = translations[currentLang].copiedTooltip;
+
+              randomWordText.innerText = copiedMessage;
+              randomWordOutput.title = copiedMessage;
+              
+              setTimeout(() => {
+                  randomWordText.innerText = originalText;
+                  randomWordOutput.title = originalTitle;
+              }, 1500);
+          }).catch(err => {
+              console.error('Failed to copy text: ', err);
+          });
+      });
+
       const gridContainer = document.getElementById("wordGrid")
       const wordResult = document.getElementById("wordResult")
 
@@ -203,26 +564,29 @@
       }
 
       // Create grid headers for suffixes
-      Object.keys(suffixes).forEach((suffix) => {
+      Object.keys(suffixes).forEach(suffix => {
         gridContainer.appendChild(createHeader(suffix))
       })
 
       // Create prefix rows with frequency-based cells
       Object.keys(prefixes).forEach((prefix, rowIndex) => {
-        gridContainer.appendChild(createHeader(prefix)) // Add prefix header
+        gridContainer.appendChild(createHeader(prefix)); // Add prefix header
 
         Object.keys(suffixes).forEach((suffix, colIndex) => {
           const frequency = frequencies[rowIndex][colIndex]
           const cell = document.createElement("div")
           cell.classList.add("cell", `frequency-${frequency}`)
+
           cell.addEventListener("click", () => {
-            const composedWord = `${prefix}-${suffix}`
-            const translatedWord = `${prefixes[prefix]}${suffixes[suffix]}`
-            wordResult.innerText = `Слово: ${composedWord}\nПеревод: ${translatedWord}`
+            const composedWord = `${prefix}-${suffix}`;
+            updateResultText(composedWord, languageSwitcher.value);
           })
           gridContainer.appendChild(cell)
         })
       })
+
+      // Initial language setup
+      setLanguage(userLanguage);
     </script>
   </body>
 </html>
